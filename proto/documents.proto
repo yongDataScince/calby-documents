@@ -1,0 +1,24 @@
+syntax = "proto3";
+package documents;
+
+enum FileType {
+  DOCX = 0;
+  XLSX = 1;
+  XLS = 3;
+  TXT = 4;
+}
+
+service Documents {
+  rpc SendFiles(SendFilesRequest) returns (SendFilesResponse);
+}
+
+message SendFilesRequest {
+  string file_name = 1;
+  FileType doc_type = 2;
+  bytes data = 3;
+}
+
+message SendFilesResponse {
+  bool successful = 2;
+  string message = 3;
+}
