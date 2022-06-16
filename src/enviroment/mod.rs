@@ -6,7 +6,7 @@ fn not_provided(var: &str) -> String {
   format!("variable {} not provided", var)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Mode {
   Development,
   Production
@@ -44,14 +44,14 @@ impl Mode {
     pub fn get_mode() -> Self {
       match env::var("MODE") {
         Ok(value) if value == String::from("production") => Self::Production,
-        Ok(value) if value == String::from("development") => Self::Production,
+        Ok(value) if value == String::from("development") => Self::Development,
         Err(_) => panic!("{}", &not_provided("MODE")),
         Ok(value) => panic!("Unexpected value: {}", value)
       }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Enviroment {
   pub host: String,
   pub port: String,

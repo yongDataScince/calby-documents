@@ -8,7 +8,7 @@ use crate::documents::{
   SendFilesRequest, SendFilesResponse
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct DocumentsServise;
 
 #[tonic::async_trait]
