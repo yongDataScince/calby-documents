@@ -11,6 +11,7 @@ panic = 'abort'
 
 [dependencies]
 base64 = "0.13.0"
+dotenv = "0.15.0"
 bb8 = "0.8"
 bb8-postgres = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
@@ -28,3 +29,5 @@ tokio-postgres = { version = "0.7.5", features = ["runtime"] }
 
 [build-dependencies]
 tonic-build = "0.7"
+tokio = { version = "1", features = ["full"] }
+tokio-postgres = { version = "0.7.5", features = ["runtime"] }
