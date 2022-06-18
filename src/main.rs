@@ -1,6 +1,7 @@
 pub mod data;
 pub mod service;
 pub mod enviroment;
+pub mod router;
 
 extern crate dotenv;
 use documents::documents_server::DocumentsServer;
@@ -24,13 +25,18 @@ async fn main() {
     dotenv().expect("Please create '.env' file and complete like '.env.example'");
 
     let env = Enviroment::init();
-    let service = Server::builder()
+    let grps_service = Server::builder()
         .add_service(DocumentsServer::new(env.service))
         .into_service();
 
     let make_service = make_service_fn(move |_conn: &hyper::server::conn::AddrStream| {
-        let service = service.clone();
-        async { Ok::<_, std::convert::Infallible>(service) }
+        let grps_service = grps_service.clone();
+
+        let service = hyper::service::service_fn(move |req| {
+            router::router(req)
+        });
+        
+        async move { Ok::<_, std::convert::Infallible>(grps_service) }
     });
 
     let server = hyper::Server::bind(&env.addr).serve(make_service);
