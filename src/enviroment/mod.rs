@@ -1,6 +1,7 @@
 use std::{env, net::SocketAddr};
 use std::fmt::Display;
 use crate::service::DocumentsServise;
+use crate::psql_handler::Db;
 
 fn not_provided(var: &str) -> String {
   format!("variable {} not provided", var)
@@ -68,12 +69,12 @@ impl Display for Enviroment {
 }
 
 impl Enviroment {
-  pub fn init() -> Self {
+  pub fn init(db: Db) -> Self {
     let mode = Mode::get_mode();
     let (host, port) = mode.get_host_port();
     let format_addr = format!("http://{}:{}", &host, &port);
     let addr: SocketAddr = format!("{}:{}", &host, &port).parse().unwrap();
-    let docs_service = DocumentsServise::default();
+    let docs_service = DocumentsServise { db };
 
     Enviroment {
       service: docs_service,

@@ -6,6 +6,9 @@ enum FileType {
   XLSX = 1;
   XLS = 3;
   TXT = 4;
+  JPG = 5;
+  PNG = 6;
+  SVG = 7;
 }
 
 service Documents {
