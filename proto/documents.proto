@@ -14,6 +14,8 @@ enum FileType {
 service Documents {
   rpc SaveFiles(SaveFilesRequest) returns (SaveFilesResponse);
   rpc GetFile(GetFileRequest) returns (GetFileResponse);
+  // rpc EditFile(EditFileRequest) returns (EditFileResponse);
+  // rpc RemoveFile(RemoveFileRequest) returns (RemoveFileResponse);
 }
 
 message SaveFilesRequest {
@@ -39,4 +41,21 @@ message GetFileResponse {
   bytes data = 1;
   string file_id = 2;
   string file_name = 3;
+}
+
+
+message EditFileRequest {
+  string file_id = 1;
+}
+
+message EditFileResponse {
+  string file_id = 1;
+}
+
+message RemoveFileRequest {
+  string file_id = 1;
+}
+
+message RemoveFileResponse {
+  bool successful = 1;
 }

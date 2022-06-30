@@ -1,5 +1,5 @@
 use uuid::Builder;
-use std::fs::File;
+use std::fs::{File, remove_file};
 use std::io::Read;
 use std::{time::{SystemTime, UNIX_EPOCH}, fmt::Debug};
 use tonic::{
@@ -12,6 +12,10 @@ use crate::{documents::{
   SaveFilesResponse,
   GetFileRequest,
   GetFileResponse,
+  EditFileRequest,
+  EditFileResponse,
+  RemoveFileRequest,
+  RemoveFileResponse,
   documents_server::Documents
 }, psql_handler::Db, data::Document};
 
@@ -100,6 +104,21 @@ impl Documents for DocumentsServise {
 
       Ok(Response::new(reply))
     }
-}
+
+    // async fn edit_file(
+    //   &self,
+    //   request: Request<EditFileRequest>
+    // ) -> Result<Response<EditFileResponse>, Status> {
+    //     todo!()
+    // }
+
+    // async fn remove_file(
+    //   &self,
+    //   request: Request<RemoveFileRequest>
+    // ) -> Result<Response<RemoveFileResponse>, Status> {
+        
+    //     todo!()
+    // }
+  }
 
 
