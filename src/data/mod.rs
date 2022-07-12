@@ -3,8 +3,9 @@ use std::{fs::write, io, path::Path};
 use postgres_types::{ToSql, FromSql};
 use serde::{Serialize, Deserialize};
 use crate::documents::SaveFilesRequest;
+use crate::utils::hash_string;
 
-#[derive(Debug, Serialize, Deserialize, ToSql, FromSql)]
+#[derive(Debug, Serialize, Deserialize, ToSql, FromSql, Hash)]
 #[postgres(name="doc_types")]
 pub enum DocType {
   #[postgres(name="DOCX")]
@@ -54,29 +55,30 @@ pub struct Document {
   pub file_id: String,
   pub file_name: String,
   pub file_type: DocType,
-  pub user_id: String,
+  pub user_hash: String,
   pub file_url: String
 }
 
 impl From<SaveFilesRequest> for Document {
     fn from(req: SaveFilesRequest) -> Self {
+        let user_hash = hash_string(req.user_id);
         Document {
           file_id: "".to_string(),
           file_name: req.file_name,
           file_type: DocType::from(req.doc_type),
-          user_id: req.user_id,
+          user_hash,
           file_url: "".to_string(),
         }
     }
 }
 
 impl Document {
-  pub fn set_url(&mut self) -> io::Result<()> {
+  pub fn set_url(&mut self, room_id: String) -> io::Result<()> {
     if self.file_id.len() == 0 {
       panic!("field `file_id` is empty")
     }
 
-    let format_path = &format!("data/{}/{}-{}", &self.file_type.folder(), &self.file_id, &self.file_name);
+    let format_path = &format!("data/{}/{}/{}-{}", room_id, &self.file_type.folder(), &self.file_id, &self.file_name);
 
     let path = Path::new(format_path);
 
@@ -96,6 +98,6 @@ impl Document {
 
 impl Display for Document {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    writeln!(f, "Document:\n  name: {};\n  doc type: {:?}\n  user_id: {}\n  file_id: {}\n  file_url: {}", self.file_name, self.file_type, self.user_id, self.file_id, self.file_url)
+    writeln!(f, "Document:\n  name: {};\n  doc type: {:?}\n file_id: {}\n  file_url: {}", self.file_name, self.file_type, self.file_id, self.file_url)
   }
 }

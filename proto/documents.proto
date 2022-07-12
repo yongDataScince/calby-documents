@@ -4,21 +4,23 @@ package documents;
 enum FileType {
   DOCX = 0;
   XLSX = 1;
-  XLS = 3;
-  TXT = 4;
-  JPG = 5;
-  PNG = 6;
-  SVG = 7;
+  XLS = 2;
+  TXT = 3;
+  JPG = 4;
+  PNG = 5;
+  SVG = 6;
 }
 
 service Documents {
   rpc SaveFiles(SaveFilesRequest) returns (SaveFilesResponse);
   rpc GetFile(GetFileRequest) returns (GetFileResponse);
+  rpc AddUserToFile(AddUserToFileRequest) returns (AddUserToFileResponse);
 }
 
 message SaveFilesRequest {
   string user_id = 1;
-  string file_name = 3;
+  string file_name = 2;
+  string room_id = 3;
   FileType doc_type = 4;
   bytes data = 5;
 }
@@ -29,10 +31,24 @@ message SaveFilesResponse {
   string info_message = 3;
 }
 
+message AddUserToFileRequest {
+  string room_id = 1;
+  string user_token = 2;
+  string user_id = 3;
+  string new_user_id = 4;
+  string file_id = 5;
+}
+
+message AddUserToFileResponse {
+  bool successful = 1;
+}
+
 message GetFileRequest {
   string user_id = 1;
-  FileType doc_type = 2;
-  string file_id = 3;
+  string user_token = 2;
+  string room_id = 3;
+  FileType doc_type = 4;
+  string file_id = 5;
 }
 
 message GetFileResponse {

@@ -1,5 +1,5 @@
 use uuid::Builder;
-use std::fs::File;
+use std::fs::{File, create_dir_all};
 use std::io::Read;
 use std::{time::{SystemTime, UNIX_EPOCH}, fmt::Debug};
 use tonic::{
@@ -7,6 +7,8 @@ use tonic::{
   Response,
   Status
 };
+use crate::documents::{AddUserToFileResponse, AddUserToFileRequest};
+use crate::utils::hash_string;
 use crate::{documents::{
   SaveFilesRequest,
   SaveFilesResponse,
@@ -42,15 +44,24 @@ impl Documents for DocumentsServise {
       request: Request<SaveFilesRequest>
     )
     -> Result<Response<SaveFilesResponse>, Status> {
+      let req = request.into_inner();
+
+      // Set timestamp
       let start = SystemTime::now();
       let since_the_epoch = start
           .duration_since(UNIX_EPOCH)
           .expect("Time went backwards");
-      
       let timestamp = since_the_epoch.as_millis();
+      // ----------------
   
-      let req = request.into_inner();
+      /*
+        check if room directory exist
+        if not exist than creatring directory
+      */
+      create_dir_all(format!("/data/{}", req.room_id))?;
+      
 
+      // create uuid for new file
       let file_id = Builder::from_slice(
         &format!("{}{}{}", req.user_id, timestamp, req.file_name)
         .as_bytes()[..16]
@@ -61,7 +72,7 @@ impl Documents for DocumentsServise {
 
       let mut document = Document::from(req.clone());
       document.file_id = file_id.to_owned();
-      document.set_url().expect("error in set url for document");
+      document.set_url(req.room_id).expect("error in set url for document");
 
       self.db.create_file(&document).await.expect("can't save file to db");
       document.save(req.data).expect("can't save file to local");
@@ -80,12 +91,13 @@ impl Documents for DocumentsServise {
       request: Request<GetFileRequest>
     ) -> Result<Response<GetFileResponse>, Status> {
       let req = request.into_inner();
-      let res = self.db.get_file(req.file_id).await.expect("can't get file from db");
+      let user_hash = hash_string(req.user_id);
+      let res = self.db.get_file(req.file_id, user_hash).await.expect("can't get file from db");
       let resp_doc =  Document {
         file_id: res.get(0),
         file_name: res.get(1),
         file_type: res.get(2),
-        user_id: res.get(3),
+        user_hash: res.get(3),
         file_url: res.get(4)
       };
       let json_doc = serde_json::to_string(&resp_doc).expect("can't stringify struct");
@@ -100,6 +112,16 @@ impl Documents for DocumentsServise {
 
       Ok(Response::new(reply))
     }
-}
+
+    async fn add_user_to_file(
+      &self,
+      request: Request<AddUserToFileRequest>
+    ) -> Result<Response<AddUserToFileResponse>, Status> {
+      let reply = AddUserToFileResponse {
+        successful: true,
+      };
+      Ok(Response::new(reply))
+    }
+  }
 
 

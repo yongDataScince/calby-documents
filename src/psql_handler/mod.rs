@@ -21,14 +21,14 @@ impl Db {
     Db { pool }
   }
 
-  pub async fn get_file(&self, file_id: String) -> MResult<Row> {
+  pub async fn get_file(&self, file_id: String, user_hash: String) -> MResult<Row> {
     let cli = self.pool.get().await?;
-    Ok(cli.query_one("select * from calby_files where file_id = $1;", &[&file_id]).await?)
+    Ok(cli.query_one("select * from calby_files where file_id = $1 and user_hash = $2;", &[&file_id, &user_hash]).await?)
   }
 
-  pub async fn get_all_files_by_user(&self, user_id: String) -> MResult<Vec<Row>> {
+  pub async fn get_all_files_by_user(&self, user_hash: String) -> MResult<Vec<Row>> {
     let cli = self.pool.get().await?;
-    Ok(cli.query("select * from calby_files where user_id = $1;", &[&user_id]).await?)
+    Ok(cli.query("select * from calby_files where user_hash = $1;", &[&user_hash]).await?)
   }
 
   pub async fn create_file(&self, document: &Document) -> MResult<String> {
@@ -38,7 +38,7 @@ impl Db {
       &document.file_id,
       &document.file_name,
       &document.file_type,
-      &document.user_id,
+      &document.user_hash,
       &document.file_url
     ]).await;
     let _ = match req {
