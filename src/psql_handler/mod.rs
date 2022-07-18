@@ -2,7 +2,7 @@ use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager as PgConManager;
 use core::marker::{Send, Sync};
 use futures::future;
-use std::{boxed::Box, env};
+use std::boxed::Box;
 use tokio_postgres::{ToStatement, types::ToSql, row::Row, NoTls};
 use crate::{data::Document};
 
