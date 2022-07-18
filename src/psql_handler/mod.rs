@@ -23,23 +23,24 @@ impl Db {
 
   pub async fn get_file(&self, file_id: String, user_hash: String) -> MResult<Row> {
     let cli = self.pool.get().await?;
-    Ok(cli.query_one("select * from calby_files where file_id = $1 and user_hash = $2;", &[&file_id, &user_hash]).await?)
+    Ok(cli.query_one("select * from calby_files where file_id = $1 and user_token = $2;", &[&file_id, &user_hash]).await?)
   }
 
   pub async fn get_all_files_by_user(&self, user_hash: String) -> MResult<Vec<Row>> {
     let cli = self.pool.get().await?;
-    Ok(cli.query("select * from calby_files where user_hash = $1;", &[&user_hash]).await?)
+    Ok(cli.query("select * from calby_files where user_token = $1;", &[&user_hash]).await?)
   }
 
   pub async fn create_file(&self, document: &Document) -> MResult<String> {
     let cli = self.pool.get().await?;
 
-    let req = cli.query_one("insert into calby_files values ($1, $2, $3, $4, $5);", &[
+    let req = cli.query_one("insert into calby_files values ($1, $2, $3, $4, $5, $6);", &[
       &document.file_id,
       &document.file_name,
       &document.file_type,
+      &document.file_url,
       &document.user_hash,
-      &document.file_url
+      &document.room_id
     ]).await;
     let _ = match req {
         Ok(res) => Some(res),
@@ -96,24 +97,9 @@ impl Db {
 ///
 /// Создаёт таблицы, которые будут предназначаться для хранения данных приложения.
 pub async fn db_setup(db: &Db) -> MResult<()> {
+  println!("Setup database");
   db.write_mul(vec![
-    // ("CREATE TYPE doc_types AS ENUM ('DOCX', 'XLSX', 'XLS', 'TXT', 'JPG', 'PNG', 'SVG');", vec![]),
-    ("create table if not exists calby_files (file_id varchar unique, file_name varchar, file_type doc_types, user_id varchar, file_url varchar);", vec![]),
+    ("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'doc_types') THEN CREATE TYPE  doc_types AS ENUM ('DOCX', 'XLSX', 'XLS', 'TXT', 'JPG', 'PNG', 'SVG'); END IF; END$$;", vec![]),
+    ("create table if not exists calby_files (file_id varchar unique, file_name varchar, file_type doc_types, file_url varchar, user_token varchar, room_id varchar unique, share_users varchar[]);", vec![]),
   ]).await
 }
-
-// pub async fn create_user(db: &Db, sign_up_credentials: &SignUpCredentials) -> MResult<i64> {
-//   let (salt, salted_pass) = key_gen::salt_pass(sign_up_credentials.pass.clone())?;
-//   let id: i64 = db.read("select nextval(pg_get_serial_sequence('calby_users', 'id'));", &[]).await?.get(0);
-//   let user_credentials = UserCredentials { salt, salted_pass, tokens: vec![] };
-//   let user_credentials = serde_json::to_string(&user_credentials)?;
-//   let billing = AccountPlanDetails {
-//     billed_forever: false,
-//     payment_data: String::new(),
-//     is_paid_whenever: false,
-//     last_payment: Utc::now()
-//   };
-//   let billing = serde_json::to_string(&billing)?;
-//   db.write("insert into calby_users values ($1, $2, '[]', $3, $4);", &[&id, &sign_up_credentials.login, &user_credentials, &billing]).await?;
-//   Ok(id)
-// }

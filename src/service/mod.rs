@@ -1,5 +1,5 @@
 use uuid::Builder;
-use std::fs::{File, create_dir_all};
+use std::fs::{File, self};
 use std::io::Read;
 use std::{time::{SystemTime, UNIX_EPOCH}, fmt::Debug};
 use tonic::{
@@ -7,6 +7,7 @@ use tonic::{
   Response,
   Status
 };
+use crate::data::DocType;
 use crate::documents::{AddUserToFileResponse, AddUserToFileRequest};
 use crate::utils::hash_string;
 use crate::{documents::{
@@ -58,9 +59,10 @@ impl Documents for DocumentsServise {
         check if room directory exist
         if not exist than creatring directory
       */
-      create_dir_all(format!("/data/{}", req.room_id))?;
+      fs::create_dir(format!("./data/{}", req.room_id)).expect("Error to create directory");
+      let req_file_type = DocType::from(req.doc_type);
+      fs::create_dir(format!("./data/{}/{}", req.room_id, req_file_type.folder() )).expect("Error to create directory");
       
-
       // create uuid for new file
       let file_id = Builder::from_slice(
         &format!("{}{}{}", req.user_id, timestamp, req.file_name)
@@ -97,8 +99,9 @@ impl Documents for DocumentsServise {
         file_id: res.get(0),
         file_name: res.get(1),
         file_type: res.get(2),
-        user_hash: res.get(3),
-        file_url: res.get(4)
+        file_url: res.get(3),
+        user_hash: res.get(4),
+        room_id: res.get(5)
       };
       let json_doc = serde_json::to_string(&resp_doc).expect("can't stringify struct");
   

@@ -28,7 +28,7 @@ async fn main() {
     dotenv().expect("Please create '.env' file and complete like '.env.example'");
 
     let manager = bb8_postgres::PostgresConnectionManager::new_from_stringlike(
-        "host=localhost password=docpass dbname=docdb user=postgres connect_timeout=10 keepalives=0",
+        "host=localhost password=4y7sV96vA9wv46VR dbname=calbyfilesdb user=postgres connect_timeout=10 keepalives=0",
         tokio_postgres::NoTls
     ).unwrap();
     let pool = bb8::Pool::builder().max_size(15).build(manager).await.unwrap();

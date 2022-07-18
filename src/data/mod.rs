@@ -56,7 +56,8 @@ pub struct Document {
   pub file_name: String,
   pub file_type: DocType,
   pub user_hash: String,
-  pub file_url: String
+  pub file_url: String,
+  pub room_id: String
 }
 
 impl From<SaveFilesRequest> for Document {
@@ -68,6 +69,7 @@ impl From<SaveFilesRequest> for Document {
           file_type: DocType::from(req.doc_type),
           user_hash,
           file_url: "".to_string(),
+          room_id: req.room_id,
         }
     }
 }
