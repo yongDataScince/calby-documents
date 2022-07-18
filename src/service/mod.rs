@@ -8,7 +8,7 @@ use tonic::{
   Status
 };
 use crate::data::DocType;
-use crate::documents::{AddUserToFileResponse, AddUserToFileRequest};
+use crate::documents::{ShareFileForUserRequest, ShareFileForUserResponse};
 use crate::utils::hash_string;
 use crate::{documents::{
   SaveFilesRequest,
@@ -116,11 +116,11 @@ impl Documents for DocumentsServise {
       Ok(Response::new(reply))
     }
 
-    async fn add_user_to_file(
+    async fn share_file_for_user(
       &self,
-      request: Request<AddUserToFileRequest>
-    ) -> Result<Response<AddUserToFileResponse>, Status> {
-      let reply = AddUserToFileResponse {
+      request: Request<ShareFileForUserRequest>
+    ) -> Result<Response<ShareFileForUserResponse>, Status> {
+      let reply = ShareFileForUserResponse {
         successful: true,
       };
       Ok(Response::new(reply))

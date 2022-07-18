@@ -1,8 +1,11 @@
+#[macro_use]
+extern crate diesel;
 pub mod data;
 pub mod service;
 pub mod enviroment;
 pub mod psql_handler;
 pub mod utils;
+pub mod db;
 pub mod documents {
     tonic::include_proto!("documents");
 }

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use crate::service::DocumentsServise;
 use crate::psql_handler::Db;
 
-fn not_provided(var: &str) -> String {
+pub fn not_provided(var: &str) -> String {
   format!("variable {} not provided", var)
 }
 

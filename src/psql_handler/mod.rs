@@ -2,10 +2,9 @@ use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager as PgConManager;
 use core::marker::{Send, Sync};
 use futures::future;
-use std::boxed::Box;
+use std::{boxed::Box, env};
 use tokio_postgres::{ToStatement, types::ToSql, row::Row, NoTls};
-
-use crate::data::Document;
+use crate::{data::Document};
 
 type MResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -34,13 +33,13 @@ impl Db {
   pub async fn create_file(&self, document: &Document) -> MResult<String> {
     let cli = self.pool.get().await?;
 
-    let req = cli.query_one("insert into calby_files values ($1, $2, $3, $4, $5, $6);", &[
+    let req = cli.query_one("insert into calby_files values ($1, $2, $3, $4, $5, $6, $7);", &[
       &document.file_id,
       &document.file_name,
       &document.file_type,
       &document.file_url,
       &document.user_hash,
-      &document.room_id
+      &document.room_id,
     ]).await;
     let _ = match req {
         Ok(res) => Some(res),
@@ -103,3 +102,4 @@ pub async fn db_setup(db: &Db) -> MResult<()> {
     ("create table if not exists calby_files (file_id varchar unique, file_name varchar, file_type doc_types, file_url varchar, user_token varchar, room_id varchar unique, share_users varchar[]);", vec![]),
   ]).await
 }
+

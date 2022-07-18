@@ -14,7 +14,7 @@ enum FileType {
 service Documents {
   rpc SaveFiles(SaveFilesRequest) returns (SaveFilesResponse);
   rpc GetFile(GetFileRequest) returns (GetFileResponse);
-  rpc AddUserToFile(AddUserToFileRequest) returns (AddUserToFileResponse);
+  rpc ShareFileForUser(ShareFileForUserRequest) returns (ShareFileForUserResponse);
 }
 
 message SaveFilesRequest {
@@ -31,7 +31,7 @@ message SaveFilesResponse {
   string info_message = 3;
 }
 
-message AddUserToFileRequest {
+message ShareFileForUserRequest {
   string room_id = 1;
   string user_token = 2;
   string user_id = 3;
@@ -39,7 +39,7 @@ message AddUserToFileRequest {
   string file_id = 5;
 }
 
-message AddUserToFileResponse {
+message ShareFileForUserResponse {
   bool successful = 1;
 }
 
