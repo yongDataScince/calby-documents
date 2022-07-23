@@ -1,9 +1,11 @@
-use diesel::{Queryable, Identifiable, table, PgConnection, RunQueryDsl, QueryDsl};
+use diesel::{Queryable, Identifiable, table, RunQueryDsl, insert_into};
+
+use crate::data::Document;
 
 use super::establish_connection;
 
 table! {
-  files (id) {
+  calby_files (id) {
       id -> Integer,
       file_id -> String,
       file_name -> VarChar,
@@ -14,8 +16,8 @@ table! {
   }
 }
 
-#[derive(Queryable, Identifiable, PartialEq)]
-#[table_name="files"]
+#[derive(Queryable, Identifiable, PartialEq, Debug)]
+#[table_name="calby_files"]
 pub struct File {
   pub id: i32,
   pub file_id: uuid::Uuid,
@@ -26,11 +28,11 @@ pub struct File {
   pub share_users: Vec<String>
 }
 
-impl File{
-    pub fn get(user_token: String, file_id: uuid::Uuid) -> Option<File> {
+impl File {
+    pub fn get_file(user_token: String, file_id: uuid::Uuid) -> Option<File> {
+      use super::schema::calby_files::table;
       let conn = establish_connection();
-      files::table
-        .load::<File>(&conn)
+      table.load::<File>(&conn)
         .unwrap()
         .into_iter()
         .find(
@@ -38,5 +40,10 @@ impl File{
             f.file_id == file_id && ( f.user_token == user_token || f.share_users.contains(&user_token)
           )
         )
+    }
+    
+    pub fn create(document: &Document) {
+      use super::schema::calby_files::table;
+      insert_into(table);
     }
 }

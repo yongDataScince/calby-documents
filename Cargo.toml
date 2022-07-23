@@ -14,10 +14,11 @@ base64 = "0.13.0"
 dotenv = "0.15.0"
 bb8 = "0.8"
 bb8-postgres = "0.8"
+chrono = { version = "0.4.19", features = ["serde"] }
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
-diesel = { version = "1.4.5", features = ["chrono", "postgres", "r2d2", "uuidv07"] }
+r2d2 = "0.8.10"
+diesel = { version = "1.4.8", features = ["postgres", "r2d2", "uuidv07", "chrono"] }
 diesel-derive-enum = "1.1.2"
-chrono = { version = "0.4", features = ["serde"] }
 custom_error = "1.9.2"
 futures = "0.3"
 tonic = "0.7"
